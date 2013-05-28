@@ -9,7 +9,7 @@ spl <- strsplit(wd, "/")
 ln <- length(spl[[1]])
 tmp = paste(spl[[1]][1:ln-1], collapse = "/")
 #'The data directories
-dataDir <- list(raw = paste(tmp, "data", "raw", sep = "/"),
+dataDir <- list(raw = paste(tmp, "data", "raw", "enron_mail_20110402", "maildir", sep = "/"),
                 processed = paste(tmp, "data", "proc", sep = "/"))
 #'The code directories
 codeDir <- list(raw = paste(wd, "raw", sep="/"),
