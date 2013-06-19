@@ -41,7 +41,6 @@ def parseMail(file):
             jsonDB[value[0]].append(line.rstrip('\n').rstrip('\r'))
         else:
             bodyFlag = True
-    #print "\n",json.dumps(jsonDB)        
     doc_id = uuid4().hex
     db[doc_id] = jsonDB
     
