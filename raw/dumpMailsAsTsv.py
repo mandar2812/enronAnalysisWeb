@@ -1,18 +1,18 @@
 #! /usr/bin/python
+import couchdb
 import sys
 import os
 import csv
+import json
+import io
+
+from uuid import uuid4
 
 dirname = os.path.dirname
 abspath = os.path.abspath
-fields = ["Message-ID", "Date", "From", "To", 
-          "Subject", "CC","Mime-Version", 
-          "Content-Type", "Content-Transfer-Encoding", 
-          "X-From", "X-To", "X-cc", "X-bcc", 
-          "X-Folder", "X-Origin", "X-FileName", "body"]
 
 dirName = sys.argv[1]
-
+dbName = sys.argv[2]
 rawDataPath = os.path.join(dirname(dirname(dirname(abspath(__file__)))),
                            "data","raw","enron_mail_20110402","maildir" )
 procDataPath = os.path.join(dirname(dirname(dirname(abspath(__file__)))),
@@ -20,47 +20,51 @@ procDataPath = os.path.join(dirname(dirname(dirname(abspath(__file__)))),
 scanDir = os.path.join(rawDataPath,dirName)
 dumpDir = os.path.join(procDataPath,dirName)
 
+server = couchdb.Server('http://127.0.0.1:5984/')
+db = server[dbName]
 
 def parseMail(file):
-    fieldflags = {"Message-ID":0, "Date":0, "From":0, "To":0, 
-                  "Subject":0, "Cc":0, "Mime-Version":0, "Content-Type":0, 
-                  "Content-Transfer-Encoding":0, "Bcc":0,"X-From":0, 
-                  "X-To":0, "X-cc":0, "X-bcc":0, "X-Folder":0, 
-                  "X-Origin":0, "X-FileName":0, "body":0}
-    linestr = []
+    bodyFlag = False
+    jsonDB = {}
     for line in file:
-        value = line.rstrip().split(":", 2)
-        if(line.find(":") == 1):
-            value = line.rstrip().split(":", 2)
-            linestr.append(value[1]) 
+        if bodyFlag:
+            jsonDB['body'] = []
+            value[0] = 'body'
+        if(line.find(":") != -1 and not bodyFlag):
+            value = line.rstrip('\n').rstrip('\r').split(":", 2)
+            try:
+                jsonDB[value[0]]
+            except KeyError:
+                jsonDB[value[0]] = [value[1]]
+                            
+        elif line.rstrip('\n').rstrip('\r'):
+            jsonDB[value[0]].append(line.rstrip('\n').rstrip('\r'))
         else:
-            linestr.append(line.rstrip())
+            bodyFlag = True
+    #print "\n",json.dumps(jsonDB)        
+    doc_id = uuid4().hex
+    db[doc_id] = jsonDB
     
-    return linestr
 
 def  processDir(dir):
     print "processing ",dir
     dumpstr = []
     for file in os.listdir(dir):
         if(os.path.isdir(os.path.join(dir, file))):
-               dumpstr.append(processDir(os.path.join(dir, file)))
+               processDir(os.path.join(dir, file))
         else:
-            fp = open(os.path.join(dir, file), 'U')
-            dumpstr.append(parseMail(fp))
-    return dumpstr
+            fp = io.open(os.path.join(dir, file), 
+                         mode='U', newline = '')
+            parseMail(fp)
+    
+
 
 if (not(os.path.isdir(scanDir))): 
     exit
-print "Dumping all files in :", scanDir, "as TSV files\n"
+print "Dumping all files in :", scanDir, " into the couchDB instance\n"
 
 for root, dirs, files in os.walk(scanDir):
     for dir in dirs:
         if not os.path.isdir(os.path.join(scanDir, dir)):
             continue
-        dumpstr = processDir(os.path.join(scanDir, dir))
-        if not os.path.isdir(dumpDir):
-            os.mkdir(dumpDir)
-        dumN = dirName + "_" + dir + ".tsv"
-        fw = open(os.path.join(dumpDir,dumN), "w")
-        new_file = csv.DictWriter(fw, fieldnames = fields, delimiter='\t')
-        new_file.writerows(dumpstr)
+        if dir == 'inbox' : processDir(os.path.join(scanDir, dir))
