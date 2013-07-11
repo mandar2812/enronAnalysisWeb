@@ -30,7 +30,7 @@ import re
 lim = sys.argv[1]
 dumpFileName = sys.argv[2]
 namesRegExp = ' (\w+,\s\w+) <([^><]+)>,?'
-baseStrength = {'To' : 1, 'CC':0.5, 'BCC':0.4}
+baseStrength = {'To' : 1, 'CC':0.05, 'BCC':0.04}
 
 dirname = os.path.dirname
 abspath = os.path.abspath

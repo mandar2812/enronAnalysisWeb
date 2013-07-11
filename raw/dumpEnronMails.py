@@ -1,4 +1,12 @@
 #! /usr/bin/python
+'''
+Author: Mandar Chandorkar
+Project : Enron
+
+This script takes the directory name of a folder inside the enron mails
+and runs the script userMailsToCouchDB.py to dump all the mails of that
+directory(or mails of one person) into the CouchDB instance.
+'''
 import sys
 import os
 import io
