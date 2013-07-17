@@ -11,6 +11,8 @@ ADMINS = (
      ('Mandar Chandorkar', 'mandar2812@gmail.com')
 )
 
+STATIC_URL = '/static/'
+
 MANAGERS = ADMINS
 
 '''DATABASES = {
