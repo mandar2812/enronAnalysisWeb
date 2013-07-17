@@ -5,7 +5,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('enronAnalysisWeb',
-                       url(r'', include('graphVisualization.urls')),
+                       url(r'graphVisualization', include('graphVisualization.urls')),
                        url(r'^admin/', include(admin.site.urls))
                        # Examples:
                            # url(r'^$', 'enronAnalysisWeb.views.home', name='home'),
