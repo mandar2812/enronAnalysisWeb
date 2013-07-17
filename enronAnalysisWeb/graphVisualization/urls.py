@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from graphVisualization.packages.views import *
+from views import *
 urlpatterns = patterns('graphVisualization.views',
                        (r'/admin','django.contrib.admin'),
                        (r'/(\w+)/','detail'),
