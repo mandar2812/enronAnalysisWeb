@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns('enronAnalysisWeb',
                        url(r'^enronAnalysisWeb', include('graphVisualization.urls')),
