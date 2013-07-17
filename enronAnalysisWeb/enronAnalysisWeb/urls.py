@@ -6,7 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('enronAnalysisWeb',
                        url(r'graphVisualization', include('graphVisualization.urls')),
-                       url(r'^admin/', include(admin.site.urls))
+                       #url(r'^admin/', include(admin.site.urls))
                        # Examples:
                            # url(r'^$', 'enronAnalysisWeb.views.home', name='home'),
                        # url(r'^enronAnalysisWeb/', include('enronAnalysisWeb.foo.urls')),
